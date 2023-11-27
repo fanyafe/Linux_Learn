@@ -17,7 +17,7 @@
 
 #include "led_opr.h"
 
-#define LED_NUM 2
+#define LED_NUM 2     // 多少灯
 
 /* 1. 确定主设备号                                                                 */
 static int major = 0;
@@ -34,19 +34,19 @@ static ssize_t led_drv_read (struct file *file, char __user *buf, size_t size, l
 	return 0;
 }
 
-/* write(fd, &val, 1); */
+/* 应用程序调用方式：   write(fd, &val, 1); */
 static ssize_t led_drv_write (struct file *file, const char __user *buf, size_t size, loff_t *offset)
 {
 	int err;
-	char status;
+	char status;      // 状态
 	struct inode *inode = file_inode(file);
 	int minor = iminor(inode);
 	
 	printk("%s %s line %d\n", __FILE__, __FUNCTION__, __LINE__);
-	err = copy_from_user(&status, buf, 1);
+	err = copy_from_user(&status, buf, 1);      // 把buf内容传入status
 
 	/* 根据次设备号和status控制LED */
-	p_led_opr->ctl(minor, status);
+	p_led_opr->ctl(minor, status);     
 	
 	return 1;
 }
@@ -56,6 +56,7 @@ static int led_drv_open (struct inode *node, struct file *file)
 	int minor = iminor(node);
 	
 	printk("%s %s line %d\n", __FILE__, __FUNCTION__, __LINE__);
+	
 	/* 根据次设备号初始化LED */
 	p_led_opr->init(minor);
 	
@@ -95,7 +96,7 @@ static int __init led_init(void)
 		unregister_chrdev(major, "led");
 		return -1;
 	}
-
+        // 次设备号i，设备节点名字 100ask_led%d
 	for (i = 0; i < LED_NUM; i++)
 		device_create(led_class, NULL, MKDEV(major, i), NULL, "100ask_led%d", i); /* /dev/100ask_led0,1,... */
 
