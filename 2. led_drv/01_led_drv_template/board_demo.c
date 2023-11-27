@@ -30,8 +30,8 @@ static int board_demo_led_ctl (int which, char status) /* 控制LED, which-哪�
 }
 
 static struct led_operations board_demo_led_opr = {
-	.init = board_demo_led_init,
-	.ctl  = board_demo_led_ctl,
+	.init = board_demo_led_init,      // 初始化函数
+	.ctl  = board_demo_led_ctl,       // 控制函数
 };
 
 struct led_operations *get_board_led_opr(void)
