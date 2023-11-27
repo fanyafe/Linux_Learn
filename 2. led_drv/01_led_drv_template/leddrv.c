@@ -22,7 +22,7 @@
 /* 1. 确定主设备号                                                                 */
 static int major = 0;
 static struct class *led_class;
-struct led_operations *p_led_opr;
+struct led_operations *p_led_opr;    // 定义一个指针
 
 
 #define MIN(a, b) (a < b ? a : b)
@@ -39,8 +39,8 @@ static ssize_t led_drv_write (struct file *file, const char __user *buf, size_t 
 {
 	int err;
 	char status;      // 状态
-	struct inode *inode = file_inode(file);
-	int minor = iminor(inode);
+	struct inode *inode = file_inode(file);   // 
+	int minor = iminor(inode);                // 得到次设备号
 	
 	printk("%s %s line %d\n", __FILE__, __FUNCTION__, __LINE__);
 	err = copy_from_user(&status, buf, 1);      // 把buf内容传入status
@@ -100,7 +100,7 @@ static int __init led_init(void)
 	for (i = 0; i < LED_NUM; i++)
 		device_create(led_class, NULL, MKDEV(major, i), NULL, "100ask_led%d", i); /* /dev/100ask_led0,1,... */
 
-	p_led_opr = get_board_led_opr();
+	p_led_opr = get_board_led_opr();   // 获得指针
 	
 	return 0;
 }
