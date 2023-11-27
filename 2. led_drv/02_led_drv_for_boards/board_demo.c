@@ -30,7 +30,7 @@ static int board_demo_led_ctl (int which, char status) /* 控制LED, which-哪�
 }
 
 static struct led_operations board_demo_led_opr = {
-	.num  = 1,
+	.num  = 1,                        // 多少盏灯
 	.init = board_demo_led_init,
 	.ctl  = board_demo_led_ctl,
 };
