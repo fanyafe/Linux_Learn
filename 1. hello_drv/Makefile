@@ -17,5 +17,5 @@ clean:
 	make -C $(KERN_DIR) M=`pwd` modules clean
 	rm -rf modules.order
 	rm -f hello_drv_test
-
+# 编译出ko文件
 obj-m	+= hello_drv.o
