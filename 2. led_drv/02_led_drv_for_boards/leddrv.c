@@ -96,7 +96,7 @@ static int __init led_init(void)
 	}
 
 	p_led_opr = get_board_led_opr();
-
+        // p_led_opr->num  结构体中获得灯的个数
 	for (i = 0; i < p_led_opr->num; i++)
 		device_create(led_class, NULL, MKDEV(major, i), NULL, "100ask_led%d", i); /* /dev/100ask_led0,1,... */
 
