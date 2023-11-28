@@ -17,23 +17,24 @@
 #include <asm/io.h>
 
 #include "led_opr.h"
-
-static volatile unsigned int *CCM_CCGR1                              ;
+// 指向虚拟地址
+static volatile unsigned int *CCM_CCGR1                              ;     
 static volatile unsigned int *IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3;
 static volatile unsigned int *GPIO5_GDIR                             ;
 static volatile unsigned int *GPIO5_DR                               ;
 
-static int board_demo_led_init (int which) /* 初始化LED, which-哪个LED */	   
+/* 初始化LED, which-哪个LED  该代码初始化了一盏灯*/
+static int board_demo_led_init (int which) 	   
 {
 	unsigned int val;
 
 	//printk("%s %s line %d, led %d\n", __FILE__, __FUNCTION__, __LINE__, which);
 	if (which == 0)
-	{
+	{       // 将物理地址映射成虚拟地址
 		if (!CCM_CCGR1)
 		{
 			CCM_CCGR1								= ioremap(0x20C406C, 4);
-			IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3 = ioremap(0x2290014, 4);
+			IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3                                 = ioremap(0x2290014, 4);
 			GPIO5_GDIR								= ioremap(0x020AC000 + 0x4, 4);
 			GPIO5_DR								= ioremap(0x020AC000 + 0, 4);
 		}
@@ -41,10 +42,10 @@ static int board_demo_led_init (int which) /* 初始化LED, which-哪个LED */
 		/* GPIO5_IO03 */
 		/* a. 使能GPIO5
 		 * set CCM to enable GPIO5
-		 * CCM_CCGR1[CG15] 0x20C406C
+		 * CCM_CCGR1[CG15] 0x20C406C  物理地址 寄存器地址
 		 * bit[31:30] = 0b11
 		 */
-		*CCM_CCGR1 |= (3<<30);
+		*CCM_CCGR1 |= (3<<30);    // 取出*CCM_CCGR1中的值，| 上某个值然后再传入CCM_CCGR1
 		
 		/* b. 设置GPIO5_IO03用于GPIO
 		 * set IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3
@@ -52,10 +53,10 @@ static int board_demo_led_init (int which) /* 初始化LED, which-哪个LED */
 		 * IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3	0x2290014
 		 * bit[3:0] = 0b0101 alt5
 		 */
-		val = *IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3;
-		val &= ~(0xf);
-		val |= (5);
-		*IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3 = val;
+		val = *IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3;  // 读取寄存器数值
+		val &= ~(0xf);        // 低四位清零
+		val |= (5);           // 修改0101
+		*IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3 = val;  // 写入
 		
 		
 		/* b. 设置GPIO5_IO03作为output引脚
@@ -63,13 +64,14 @@ static int board_demo_led_init (int which) /* 初始化LED, which-哪个LED */
 		 * GPIO5_GDIR  0x020AC000 + 0x4
 		 * bit[3] = 0b1
 		 */
-		*GPIO5_GDIR |= (1<<3);
+		*GPIO5_GDIR |= (1<<3);  
 	}
 	
 	return 0;
 }
 
-static int board_demo_led_ctl (int which, char status) /* 控制LED, which-哪个LED, status:1-亮,0-灭 */
+/* 控制LED, which-哪个LED, status:1-亮,0-灭 */
+static int board_demo_led_ctl (int which, char status) 
 {
 	//printk("%s %s line %d, led %d, %s\n", __FILE__, __FUNCTION__, __LINE__, which, status ? "on" : "off");
 	if (which == 0)
@@ -81,7 +83,7 @@ static int board_demo_led_ctl (int which, char status) /* 控制LED, which-哪�
 			 * GPIO5_DR 0x020AC000 + 0
 			 * bit[3] = 0b0
 			 */
-			*GPIO5_DR &= ~(1<<3);
+			*GPIO5_DR &= ~(1<<3);    // bit[3]清零
 		}
 		else  /* off: output 1*/
 		{
@@ -90,7 +92,7 @@ static int board_demo_led_ctl (int which, char status) /* 控制LED, which-哪�
 			 * GPIO5_DR 0x020AC000 + 0
 			 * bit[3] = 0b1
 			 */ 
-			*GPIO5_DR |= (1<<3);
+			*GPIO5_DR |= (1<<3); // 或操作
 		}
 	
 	}
